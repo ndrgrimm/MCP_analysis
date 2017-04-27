@@ -1,0 +1,4 @@
+[Project]
+Name=Matlab
+Manager=KDevCMakeManager
+VersionControl=kdevgit
