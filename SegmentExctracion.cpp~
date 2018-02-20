@@ -1,0 +1,105 @@
+#include <../../home/ndrg/projects/mops/Common/types.h>
+/*
+*
+*
+* 
+* 
+* 
+* 
+* 
+* 
+*/
+
+#include <istream>
+#include <string.h>
+#include <stdint.h>
+
+#define  log std::cout 
+
+#define SAMPLE_BYTE		0
+#define SAMPLE_INT8		1
+#define SAMPLE_INT16	2
+#define SAMPLE_INT32	3
+#define SAMPLE_INT64	4
+#define SAMPLE_DOUBLE	5
+
+struct SArgument
+{
+	char Type;
+	union uArgument
+	{
+		u_char Bytes[64];
+		__int64	Integer;
+		double Real;
+	}
+	Argument;
+};
+
+
+struct SFlag
+ {
+     char       Name[16];
+     SArgument   Flag;
+ };
+
+
+ struct SFlagList
+ {
+     uint16_t  size;
+     SFlag*   Flags;
+ };
+ 
+struct SSegment
+{
+    u_char    SampleType;
+    void*   ptrArray;
+    uint32   arrSize;
+    SFlag*  FlagList;
+    int     FlagCount;                      
+};
+
+
+
+SSegment* GetSegment(std::istream* InputStream){
+    
+    SSegment* Segment= 0;
+    
+    char tmpBuffer[128];
+    InputStream->get(tmpBuffer,4);
+    int HeaderSize=(*(uint32_t*) tmpBuffer);
+    InputStream->get(tmpBuffer,HeaderSize);
+    if (*((uint32_t*) tmpBuffer) != 'BIN1')
+    {
+        log << "Wrong Binary Type: Inside " << tmpBuffer << " Expetted: BIN1" 
+            << std::endl;
+        return 0;
+    }
+    
+    InputStream->get(tmpBuffer,1);
+    Segment->SampleType= *((u_char*) tmpBuffer);      // FIXIT Byte is not a C type, change it on mops!
+    
+    
+    
+    InputStream->get( tmpBuffer, 4);
+    int SizeFlagList= *((int*) tmpBuffer);
+    Segment->FlagCount= SizeFlagList/sizeof(SFlag);
+    
+    if ( SizeFlagList ){
+        InputStream->get( tmpBuffer, SizeFlagList );
+        Segment->FlagList=(SFlag*) tmpBuffer;
+        
+    }
+    
+    InputStream->get( tmpBuffer, 4 );
+    Segment->arrSize=*((int*)tmpBuffer);
+    
+    
+    //TODO Maybe I have to recast Here
+    
+    InputStream->get( (char*)Segment->ptrArray, Segment->arrSize );
+
+    
+    return Segment
+}
+
+
