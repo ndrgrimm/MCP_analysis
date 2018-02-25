@@ -194,8 +194,7 @@ SSegment* GetSegment(std::istream* InputStream){                                
 
 void TestDeleteSegment(SSegment* ToDelete ){
     
-    struct SSegment
-{
+
     ToDelete->SampleType=0;
     ToDelete->arrSize =0;
     ToDelete->FlagCount= 0;                      
@@ -204,7 +203,6 @@ void TestDeleteSegment(SSegment* ToDelete ){
     delete ToDelete->FlagList;
     
     delete ToDelete;
-};
     
 }
 

@@ -36,7 +36,7 @@
 
 
 
-struct SArgument
+struct SArgument // move it
 {
 	u_char Type;
 	union uArgument
@@ -49,14 +49,14 @@ struct SArgument
 };
 
 
-struct SFlag_Inside
+struct SFlag_Inside //move it
  {
      uint16_t Name[16];
      SArgument   Flag;
  };
  
 
- struct SFlag
+ struct SFlag //move it
  {
      char Name[16];
      SArgument   Flag;
@@ -192,7 +192,7 @@ SSegment* GetSegment(std::istream* InputStream){                                
     return SegmentRead;
 }
 
-void TestDeleteSegment(SSegment* ToDelete ){
+void TestDeleteSegment(SSegment* ToDelete ){ // moveit
     
 
     ToDelete->SampleType=0;
