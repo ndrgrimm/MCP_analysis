@@ -65,11 +65,11 @@ struct SFlag_Inside
 
 struct SSegment
 {
-    u_char    SampleType;
-    char*   ptrArray;
+    u_char     SampleType;
+    char*      ptrArray;
     uint32_t   arrSize;
-    SFlag*  FlagList;
-    int     FlagCount;                      
+    SFlag*     FlagList;
+    int        FlagCount;                      
 };
 
 int GetSampleCount(SSegment* Segment)
@@ -106,8 +106,11 @@ double GetSample(SSegment* Segment, int Sample)
 	return 0;
 }
 
-
-SSegment* GetSegment(std::istream* InputStream){
+/*!
+ * \brief Read from a istream a binary a return an array of segment
+ * 
+ */
+SSegment* GetSegment(std::istream* InputStream){                                //FIXME: forse meglio sostituire return 0 con return NULL
     
     if (InputStream->tellg() < 0)
         return 0 ;
@@ -119,8 +122,8 @@ SSegment* GetSegment(std::istream* InputStream){
     
     if ( 4 !=(*(uint32_t*) tmpBuffer) )
     { 
-       errlog << "Wrong Header";
-       errlog << InputStream->tellg() << std::endl;
+       errlog << "Wrong Header: " << (*(uint32_t*) tmpBuffer) << std::endl;
+       errlog << "bit position:"<< InputStream->tellg() << std::endl;
        return 0;
        
     }
@@ -136,36 +139,37 @@ SSegment* GetSegment(std::istream* InputStream){
         return 0;
     }
     
-    SSegment* Segment= new SSegment;
+    
     InputStream->read(tmpBuffer,sizeof(unsigned char));
-    Segment->SampleType=*tmpBuffer;
+    SSegment* SegmentRead= new SSegment;
+    SegmentRead->SampleType=*tmpBuffer;
     
 
     
     
     InputStream->read(tmpBuffer,sizeof(int));
     int SizeFlagList= *((int*) tmpBuffer);
-    Segment->FlagCount= SizeFlagList/sizeof(SFlag_Inside);
+    SegmentRead->FlagCount= SizeFlagList/sizeof(SFlag_Inside);
 
     
-    
+    // FIXME: find a more stable and secure check:
     if ( SizeFlagList ){
-        Segment->FlagList=new SFlag[Segment->FlagCount];
+        SegmentRead->FlagList=new SFlag[SegmentRead->FlagCount];
         
-        SFlag_Inside* tmpFlagInsideList=new SFlag_Inside[Segment->FlagCount];
+        SFlag_Inside* tmpFlagInsideList=new SFlag_Inside[SegmentRead->FlagCount];
         
         InputStream->read( ((char*)tmpFlagInsideList), SizeFlagList);
-        for (int i=0; i<Segment->FlagCount;++i)
+        for (int i=0; i<SegmentRead->FlagCount;++i)
         {
-            Segment->FlagList[i].Flag.Type=tmpFlagInsideList[i].Flag.Type;
-            Segment->FlagList[i].Flag.Argument.Integer=tmpFlagInsideList[i].Flag.Argument.Integer;
-            Segment->FlagList[i].Flag.Argument.Real=tmpFlagInsideList[i].Flag.Argument.Real;
-            strcpy( Segment->FlagList[i].Flag.Argument.Bytes,tmpFlagInsideList[i].Flag.Argument.Bytes);
+            SegmentRead->FlagList[i].Flag.Type=tmpFlagInsideList[i].Flag.Type;
+            SegmentRead->FlagList[i].Flag.Argument.Integer=tmpFlagInsideList[i].Flag.Argument.Integer;
+            SegmentRead->FlagList[i].Flag.Argument.Real=tmpFlagInsideList[i].Flag.Argument.Real;
+            strcpy( SegmentRead->FlagList[i].Flag.Argument.Bytes,tmpFlagInsideList[i].Flag.Argument.Bytes);
             for(int j =0; j<16; ++j){
-                Segment->FlagList[i].Name[j]=char(tmpFlagInsideList[i].Name[j]);
+                SegmentRead->FlagList[i].Name[j]=char(tmpFlagInsideList[i].Name[j]);
                 
             }
-            Segment->FlagList[i].Name[15]='\0';
+            SegmentRead->FlagList[i].Name[15]='\0';
                 
             
         }
@@ -178,15 +182,28 @@ SSegment* GetSegment(std::istream* InputStream){
     
     
     InputStream->read( tmpBuffer, sizeof(int));    // Read Array Size
-    Segment->arrSize= ( *((int*)tmpBuffer) );            // Save Array Size
+    SegmentRead->arrSize= ( *((int*)tmpBuffer) );            // Save Array Size
     
 
     
-    Segment->ptrArray=new char[Segment->arrSize ];   // Copy data
-    InputStream->read(  Segment->ptrArray , Segment->arrSize);
+    SegmentRead->ptrArray=new char[SegmentRead->arrSize ];   // Copy data
+    InputStream->read(  SegmentRead->ptrArray , SegmentRead->arrSize);
     
-    return Segment;
+    return SegmentRead;
 }
 
+void TestDeleteSegment(SSegment* ToDelete ){
+    
+
+    ToDelete->SampleType=0;
+    ToDelete->arrSize =0;
+    ToDelete->FlagCount= 0;                      
+    
+    delete ToDelete->ptrArray;
+    delete ToDelete->FlagList;
+    
+    delete ToDelete;
+    
+}
 
 #endif // SEGMENT_EXCTRACTION

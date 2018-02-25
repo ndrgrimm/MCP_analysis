@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
     SSegment* Segment;
 
     Input->seekg(0,Input->end);
-    int FileLenght =Input->tellg();
+    long long int FileLenght = Input->tellg();                                  // ndrg: FileLenght can be very very big
     Input->seekg(0,Input->beg);
-
-    int i=0;
+    std::cout << "length File: " <<  FileLenght << std::endl;
+   
     
     
     
@@ -29,18 +29,20 @@ int main(int argc, char **argv) {
     int tmp=0;
     int tmp2=0;
     int NumberOfSegment=0;
-    while(Input->tellg() < FileLenght)
+    while(Input->tellg() < FileLenght)                                          // FIXME memory leak like shit
+        
     {
         NumberOfSegment++;
         Segment= GetSegment(Input);
-        tmp2=Segment2Frame(Segment)->FlagList[std::string("RUN")].Argument.Integer;
-        if (tmp != tmp2 ){
-            
-            tmp=tmp2;
-            log << tmp << std::endl;
-        }
+        TFrame* Frame_tmp=Segment2Frame(Segment);                           
+      //  std::cout << GetSample(Frame_tmp,100) <<  std::endl;
+         TestDeleteSegment(Segment) ;                                            // FIXME: ofcourse if I delete the array on the
+       // delete Segment;                                                                        // segment I'll delete it on the Frame too
+        
+        //if( NumberOfSegment >= 10 ) break;
     }
     Input->close();
+    
     
     log << "Number Of Frame: " << NumberOfSegment << std::endl;
 
