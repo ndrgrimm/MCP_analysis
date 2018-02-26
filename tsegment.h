@@ -39,36 +39,33 @@
 #include <string.h>
 
 
-struct SArgument
-{
-	u_char Type;
-	union uArgument
-	{
-		char Bytes[64];
-		int64_t	Integer;
-		double Real;
-	}
-	Argument;
-};
 
-struct SFlag
- {
-     char Name[16];
-     SArgument   Flag;
- };
+
  
-struct SFlag_Inside
- {
-     uint16_t Name[16];
-     SArgument   Flag;
- };
- 
-
-
-
 class TSegment{
     
 public:
+    
+    class SFlag
+    {
+    public:
+        struct SArgument {
+            u_char Type; //!< ARG_ Enumerate 
+            union uArgument {
+                char Bytes[64];
+                int64_t	Integer;
+                double Real;
+            }
+            Argument;
+
+        };
+        char Name[16];
+        SArgument   Flag;
+        
+    };
+    
+    
+    
     friend  TSegment* loadSegment(std::istream* InputStream);
     ~TSegment();
     
@@ -77,15 +74,24 @@ public:
     //FIXME Set it in Template design
     double     GetSample(int Sample);
     int        GetSampleCount();
+    void       printFlags(  std::ostream& outStream= std::cout );
 
     
     // FIXME sistemare diritti accesso lettura scrittura
+
     u_char     getSampleType(){ return SampleType; };
     char*      getPtrArray()  { return ptrArray;   };
     uint32_t   getArrSize()   { return arrSize;    };
-    SFlag*     getFlagList()  {return FlagList;    };
-    int        getFlagCount() {return FlagCount;   }; 
+    SFlag*     getFlagList()  { return FlagList;    };
+    int        getFlagCount() { return FlagCount;   };
+    
+    
+    
 
+   
+
+
+    
     
 private:
     TSegment(){}

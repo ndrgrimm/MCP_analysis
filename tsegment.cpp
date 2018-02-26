@@ -30,6 +30,14 @@
 
 TSegment* loadSegment( std::istream* InputStream )
 {
+    struct SFlag_Inside {
+        uint16_t Name[16];
+        TSegment::SFlag::SArgument   Flag;
+    };
+    
+    
+    
+    
     if ( InputStream->tellg() < 0 ) {
         return 0 ;
     }
@@ -71,7 +79,7 @@ TSegment* loadSegment( std::istream* InputStream )
 
     // FIXME: find a more stable and secure check:
     if ( SizeFlagList ) {
-        SegmentRead->FlagList=new SFlag[SegmentRead->FlagCount];
+        SegmentRead->FlagList=new TSegment::SFlag[SegmentRead->FlagCount];
 
         SFlag_Inside* tmpFlagInsideList=new SFlag_Inside[SegmentRead->FlagCount];
 
@@ -97,12 +105,12 @@ TSegment* loadSegment( std::istream* InputStream )
 
 
 
-    InputStream->read ( tmpBuffer, sizeof ( int ) ); // Read Array Size
-    SegmentRead->arrSize= ( * ( ( int* ) tmpBuffer ) );      // Save Array Size
+    InputStream->read ( tmpBuffer, sizeof ( int ) );          // Read Array Size
+    SegmentRead->arrSize= ( * ( ( int* ) tmpBuffer ) );       // Save Array Size
 
 
 
-    SegmentRead->ptrArray=new char[SegmentRead->arrSize ];   // Copy data
+    SegmentRead->ptrArray=new char[SegmentRead->arrSize ];   // Copy data created with new[]
     InputStream->read ( SegmentRead->ptrArray , SegmentRead->arrSize );
 
     return SegmentRead;
@@ -118,8 +126,8 @@ TSegment::~TSegment()
     this->arrSize =0;
     this->FlagCount= 0;
 
-    delete this->FlagList;
-    delete this->ptrArray;
+    delete[] this->FlagList;
+    delete[] this->ptrArray;
   
 }
 
@@ -166,3 +174,31 @@ double  TSegment::GetSample ( int Sample )
 
     return 0;
 }
+
+
+
+void TSegment::printFlags( std::ostream& outStream)
+{
+    
+    
+    for (int i=0; i <this->FlagCount;i+=1){
+        
+        outStream << this->FlagList[i].Name << " : " << std::flush;
+
+        switch ( this->FlagList[i].Flag.Type ) {
+        case ARG_REAL :
+            outStream << this->FlagList[i].Flag.Argument.Real << " : " << std::endl;
+            break;
+        case ARG_INTEGER :
+            outStream << this->FlagList[i].Flag.Argument.Integer << " : " << std::endl;
+            break;
+        case ARG_BYTE :
+            outStream << this->FlagList[i].Flag.Argument.Bytes << " : " << std::endl;
+            break;
+        }
+
+    }
+    
+  
+}
+
