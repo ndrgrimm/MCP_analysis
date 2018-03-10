@@ -66,7 +66,7 @@ public:
     
     
     
-    friend  TSegment* loadSegment(std::istream* InputStream);
+    friend  TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop, uint FlagThreshold );
     ~TSegment();
     
     
@@ -75,15 +75,15 @@ public:
     double     GetSample(int Sample);
     int        GetSampleCount();
     void       printFlags(  std::ostream& outStream= std::cout );
-
+    int        getFlagIndex(char* FlagName);
     
     // FIXME sistemare diritti accesso lettura scrittura
 
-    u_char     getSampleType(){ return SampleType; };
-    char*      getPtrArray()  { return ptrArray;   };
-    uint32_t   getArrSize()   { return arrSize;    };
-    SFlag*     getFlagList()  { return FlagList;    };
-    int        getFlagCount() { return FlagCount;   };
+    u_char           getSampleType(){ return SampleType; };
+    char*            getPtrArray()  { return ptrArray;   };
+    uint32_t         getArrSize()   { return arrSize;    };
+    const SFlag*     getFlagList()  { return FlagList;    };
+    int              getFlagCount() { return FlagCount;   };
     
     
     
@@ -105,6 +105,6 @@ private:
     
     
 };
-TSegment* loadSegment(std::istream* InputStream);
 
+ TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop, uint FlagThreshold );
 #endif // TSEGMENT_H

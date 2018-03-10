@@ -28,7 +28,7 @@
 
 
 
-TSegment* loadSegment( std::istream* InputStream )
+TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop, uint FlagThreshold )
 {
     struct SFlag_Inside {
         uint16_t Name[16];
@@ -95,7 +95,6 @@ TSegment* loadSegment( std::istream* InputStream )
             }
             SegmentRead->FlagList[i].Name[15]='\0';
 
-
         }
     }
 
@@ -111,13 +110,59 @@ TSegment* loadSegment( std::istream* InputStream )
 
 
     SegmentRead->ptrArray=new char[SegmentRead->arrSize ];   // Copy data created with new[]
+    
     InputStream->read ( SegmentRead->ptrArray , SegmentRead->arrSize );
+    
+    int Flag =0;
+    int FlagEx =SegmentRead->GetSample( (FlagStop + FlagStart)/2) ;
+    bool Flagx=true;
+    for (int indexSegment= FlagStart; indexSegment < FlagStop; ++ indexSegment ){
+        if ( SegmentRead->GetSample( indexSegment ) < FlagThreshold)
+             {
+            Flagx=false;
+             }
+    }
+    
+//     log << "Flag" << Flag << std::endl;
+    Flag/=(FlagStop-FlagStart);
+//     log << "Flag" << Flag << std::endl;
+//     log << "FlagEx" << FlagEx << std::endl;
 
+    bool Mode = (FlagEx > FlagThreshold);
+//     log << Mode << std::endl;
+    int ModeIndex=-1;
+    int FlagIndex=-1;
+    for ( int index=0; index< SegmentRead->getFlagCount();++index )
+    {
+        if( strcmp(SegmentRead->FlagList[index].Name, "MODE" ) == 0  ){
+            ModeIndex=index;
+        }
+        if( strcmp(SegmentRead->FlagList[index].Name, "FLAG" ) == 0  ){
+            FlagIndex=index;
+        }   
+        
+    }
+    
+    if ( Flagx ) {
+        SegmentRead->FlagList[ModeIndex].Flag.Argument=SegmentRead->FlagList[FlagIndex].Flag.Argument;
+        SegmentRead->FlagList[ModeIndex].Flag.Type=SegmentRead->FlagList[FlagIndex].Flag.Type;
+    }
+    //if (Falgx) log << "Flag update" << std::endl;
+    
     return SegmentRead;
 
 
 }
 
+int TSegment::getFlagIndex(char* FlagName){
+    for ( int flagindex=0; flagindex< this->getFlagCount();++flagindex)
+    {
+        if( strcmp(this->FlagList[flagindex].Name, FlagName ) ==0 ){
+            return flagindex;
+        }
+    }
+    return -1;
+}
 
 
 TSegment::~TSegment()
@@ -128,7 +173,7 @@ TSegment::~TSegment()
 
     delete[] this->FlagList;
     delete[] this->ptrArray;
-  
+    
 }
 
 
@@ -187,13 +232,13 @@ void TSegment::printFlags( std::ostream& outStream)
 
         switch ( this->FlagList[i].Flag.Type ) {
         case ARG_REAL :
-            outStream << this->FlagList[i].Flag.Argument.Real << " : " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Real << " ; " << std::endl;
             break;
         case ARG_INTEGER :
-            outStream << this->FlagList[i].Flag.Argument.Integer << " : " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Integer << " ; " << std::endl;
             break;
         case ARG_BYTE :
-            outStream << this->FlagList[i].Flag.Argument.Bytes << " : " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Bytes << " ; " << std::endl;
             break;
         }
 
@@ -202,3 +247,17 @@ void TSegment::printFlags( std::ostream& outStream)
   
 }
 
+// TSegment::SFlag::SArgument TSegment::getFlagsArg( char*FlagTag )
+// {
+//     
+//     
+//     for (int i=0; i <this->FlagCount;i+=1){
+//         
+//         outStream << this->FlagList[i].Name << " : " << std::flush;
+// 
+//         
+// 
+//     }
+//     return 
+//   
+// }
