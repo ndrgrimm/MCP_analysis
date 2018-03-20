@@ -20,8 +20,8 @@ void Analysis ( TNtuple* PeakInfo,TH1F* SpectrumFiltred,TH1F* Spectrum,TSegment 
         return;
     }
 
-
-    TH1F * TmpSpectrum= ( TH1F* ) Spectrum->Clone();
+    TH1F* TmpSpectrum = new TH1F ( "TmpSpectrum", "", Stop-Start,0,Stop-Start );
+    
     TSpectrum* Analyzer;
 
 
@@ -31,7 +31,10 @@ void Analysis ( TNtuple* PeakInfo,TH1F* SpectrumFiltred,TH1F* Spectrum,TSegment 
     for ( int i=0; i <lenght; ++i ) {
         ptrArray_f[i]=-1*inData->GetSample ( Start+i ); // change sign of data
         Spectrum->Fill ( i,ptrArray_f[i] );
-        if ( ptrArray_f[i] < ThreadShold ) {
+        if ( ptrArray_f[i] <         
+        
+        
+    ThreadShold ) {
             TmpSpectrum->SetBinContent ( i,0 );
         } else {
             TmpSpectrum->SetBinContent ( i,ptrArray_f[i] );
@@ -39,7 +42,7 @@ void Analysis ( TNtuple* PeakInfo,TH1F* SpectrumFiltred,TH1F* Spectrum,TSegment 
         }
     }
     if ( !SomethingBigger ) {
-        //if(false){
+        //if(false){    
         PeakInfo->Fill ( 0, 0, -1 );
         return;
     } else {
@@ -49,15 +52,12 @@ void Analysis ( TNtuple* PeakInfo,TH1F* SpectrumFiltred,TH1F* Spectrum,TSegment 
 
 
 
-    std::cout << "Max: " << TmpSpectrum->GetBinContent ( TmpSpectrum->GetMaximumBin() ) << std::endl;
-
-
-    Analyzer->Search ( TmpSpectrum, 2, "", 0.05 );
+    Analyzer->Search ( TmpSpectrum, 2, "goff", 0.05 );
 
     Double_t * dest   = new Double_t[lenght];
     //Analyzer->SearchHighRes ( ptrArray_f,dest,lenght,2, 10  ,kFALSE,3,kFALSE,1 );
 
-    std::cout << "PeakNumber: " << Analyzer->GetNPeaks() << std::endl;
+    //std::cout << "PeakNumber: " << Analyzer->GetNPeaks() << std::endl;
 
     for ( int peak=0; peak<Analyzer->GetNPeaks(); ++peak ) {
         PeakInfo->Fill ( ptrArray_f[int(Analyzer->GetPositionX() [peak]+0.5)],  //TEST
@@ -67,13 +67,14 @@ void Analysis ( TNtuple* PeakInfo,TH1F* SpectrumFiltred,TH1F* Spectrum,TSegment 
     }
 
 
-
-    if ( Analyzer->GetNPeaks() <= NumberPeakMax ) {
-        for ( int peak =0; peak < NumberPeakMax && peak < Analyzer->GetNPeaks() ; ++peak ) {
-            SpectrumFiltred->Fill ( int(Analyzer->GetPositionX() [peak]) );          
+    if( SpectrumFiltred != NULL && SpectrumFiltred != 0 ){
+        if ( Analyzer->GetNPeaks() <= NumberPeakMax ) {
+            for ( int peak =0; peak < NumberPeakMax && peak < Analyzer->GetNPeaks() ; ++peak ) {
+                SpectrumFiltred->Fill ( int(Analyzer->GetPositionX() [peak]) );          
+            }
         }
     }
-
+    delete TmpSpectrum;
     delete Analyzer;
     delete[] ptrArray_f;
     delete[] dest;
@@ -173,7 +174,10 @@ void AnalysisIntegralDiscriminator ( TH1F* SpectrumFiltred,TH1F* Spectrum,TSegme
 //
 //     if( Spectrum != NULL ){
 //
-//     for ( int i=0; i <lenght; ++i ) {
+//     for ( int i=0; i <lenght; ++i ) {        
+        
+        
+    
 //             Spectrum->Fill ( Start+i,-1.* (inData->GetSample( Start+i ) ) );
 //
 //         }
