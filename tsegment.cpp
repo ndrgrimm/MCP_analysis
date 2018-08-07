@@ -96,6 +96,7 @@ TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop,
             SegmentRead->FlagList[i].Name[15]='\0';
 
         }
+        delete[] tmpFlagInsideList;
     }
 
 
@@ -154,7 +155,7 @@ TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop,
 
 }
 
-int TSegment::getFlagIndex(char* FlagName){
+int TSegment::GetFlagIndex(const char* FlagName){
     for ( int flagindex=0; flagindex< this->getFlagCount();++flagindex)
     {
         if( strcmp(this->FlagList[flagindex].Name, FlagName ) ==0 ){
@@ -225,20 +226,21 @@ double  TSegment::GetSample ( int Sample )
 void TSegment::printFlags( std::ostream& outStream)
 {
     
-    
-    for (int i=0; i <this->FlagCount;i+=1){
+    outStream << "#------------------------------------------------------------"
+    << "\nNumber of Flags:"<< this->FlagCount << std::endl;
+    for (int i=0; i <this->FlagCount;i++){
         
         outStream << this->FlagList[i].Name << " : " << std::flush;
 
         switch ( this->FlagList[i].Flag.Type ) {
         case ARG_REAL :
-            outStream << this->FlagList[i].Flag.Argument.Real << " ; " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Real << "|R; " << std::endl;
             break;
         case ARG_INTEGER :
-            outStream << this->FlagList[i].Flag.Argument.Integer << " ; " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Integer << "|I; " << std::endl;
             break;
         case ARG_BYTE :
-            outStream << this->FlagList[i].Flag.Argument.Bytes << " ; " << std::endl;
+            outStream << this->FlagList[i].Flag.Argument.Bytes << "|C; " << std::endl;
             break;
         }
 

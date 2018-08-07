@@ -69,21 +69,22 @@ public:
     friend  TSegment* loadSegment( std::istream* InputStream, uint FlagStart, uint FlagStop, uint FlagThreshold );
     ~TSegment();
     
+
     
     
     //FIXME Set it in Template design
     double     GetSample(int Sample);
     int        GetSampleCount();
     void       printFlags(  std::ostream& outStream= std::cout );
-    int        getFlagIndex(char* FlagName);
+    int        GetFlagIndex(const char* FlagName);
     
     // FIXME sistemare diritti accesso lettura scrittura
 
     u_char           getSampleType(){ return SampleType; };
     char*            getPtrArray()  { return ptrArray;   };
     uint32_t         getArrSize()   { return arrSize;    };
-    const SFlag*     getFlagList()  { return FlagList;    };
-    int              getFlagCount() { return FlagCount;   };
+    const SFlag*     getFlagList()  { return FlagList;   };    //FIXME using this function generate a memory leak
+    int              getFlagCount() { return FlagCount;  };
     
     
     

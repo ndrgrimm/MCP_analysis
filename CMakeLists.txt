@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0 )
 project(matlab)
 
 #---ROOT libraries/modules needed by our classes
-set(rootLibsToLink Core Hist Spectrum RIO Tree)
+set(rootLibsToLink Core Hist Spectrum RIO Tree Gpad)
 
 #---specify needed libraries so they are added to ${ROOT_LIBRARIES}
 find_package(ROOT REQUIRED ${rootLibsToLink})
@@ -29,8 +29,8 @@ set(TARGET_H tsegment.h  )
 set(TARGET_SRC tsegment.cpp )
 
 
-add_executable(matlab main.cpp ${TARGET_H} ${TARGET_SRC}  )
-target_link_libraries(matlab ${rootLibsToLink})
+add_executable(MfileLoad main.cpp ${TARGET_H} ${TARGET_SRC}  )
+target_link_libraries(MfileLoad ${rootLibsToLink})
 
 
 #install(TARGETS matlab RUNTIME DESTINATION bin)
